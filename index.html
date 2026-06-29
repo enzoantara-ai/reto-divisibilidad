@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reto de Divisibilidad — 4° Primaria | Wise House School</title>
+<style>
+  :root{
+    --azul:#1F4E79; --azul2:#378ADD; --verde:#3B6D11; --verde2:#63991F;
+    --morado:#534AB7; --rojo:#C0392B; --ambar:#BA7517;
+    --bg:#f4f7fb; --card:#ffffff; --texto:#2c2c2a; --suave:#6b6b66;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    font-family:'Segoe UI',system-ui,Arial,sans-serif;
+    background:linear-gradient(160deg,#eaf1fb 0%,#f4f7fb 60%,#fdf6ec 100%);
+    color:var(--texto); min-height:100vh; padding:16px;
+    display:flex; align-items:flex-start; justify-content:center;
+  }
+  .app{width:100%; max-width:640px}
+  .card{
+    background:var(--card); border-radius:18px; padding:26px 24px;
+    box-shadow:0 10px 30px rgba(31,78,121,.12); border:1px solid #e6ecf3;
+  }
+  header.top{text-align:center; margin-bottom:18px}
+  .lema{font-size:12px; color:var(--suave); font-style:italic; margin-bottom:6px}
+  h1{font-size:23px; color:var(--azul); line-height:1.2}
+  .sub{font-size:14px; color:var(--suave); margin-top:4px}
+  .badge{display:inline-block; background:#eaf1fb; color:var(--azul);
+    border-radius:999px; padding:4px 12px; font-size:12px; font-weight:600; margin-top:10px}
+
+  /* Pantalla inicio */
+  .menu p{font-size:15px; line-height:1.6; color:#444; margin:14px 0}
+  .modos{display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin:18px 0}
+  .modo{border:2px solid #e0e6ee; border-radius:14px; padding:12px 8px; text-align:center;
+    cursor:pointer; transition:.15s; background:#fafbfd}
+  .modo:hover{border-color:var(--azul2); transform:translateY(-2px)}
+  .modo.sel{border-color:var(--azul); background:#eaf1fb}
+  .modo .emoji{font-size:26px; display:block}
+  .modo .nombre{font-size:13px; font-weight:600; margin-top:4px; color:var(--azul)}
+  .modo .desc{font-size:11px; color:var(--suave); margin-top:2px}
+
+  button.btn{
+    width:100%; border:none; border-radius:14px; padding:15px;
+    font-size:17px; font-weight:700; color:#fff; cursor:pointer;
+    background:linear-gradient(135deg,var(--azul) 0%,var(--azul2) 100%);
+    box-shadow:0 6px 16px rgba(55,138,221,.3); transition:.15s; margin-top:6px;
+  }
+  button.btn:hover{filter:brightness(1.06); transform:translateY(-1px)}
+  button.btn.verde{background:linear-gradient(135deg,var(--verde) 0%,var(--verde2) 100%);
+    box-shadow:0 6px 16px rgba(99,153,31,.3)}
+  button.btn.gris{background:#8a8a85; box-shadow:none}
+
+  /* Barra de progreso */
+  .barra-cont{display:flex; align-items:center; gap:12px; margin-bottom:16px}
+  .progreso{flex:1; height:10px; background:#e6ecf3; border-radius:99px; overflow:hidden}
+  .progreso > i{display:block; height:100%; width:0;
+    background:linear-gradient(90deg,var(--azul2),var(--verde2)); transition:width .3s}
+  .puntos{font-size:14px; font-weight:700; color:var(--azul); white-space:nowrap}
+
+  .pregunta-num{font-size:13px; color:var(--suave); margin-bottom:6px; font-weight:600}
+  .enunciado{font-size:19px; line-height:1.5; margin-bottom:8px; font-weight:600}
+  .contexto{font-size:14px; color:var(--suave); margin-bottom:18px; line-height:1.5}
+  .formula{font-family:'Courier New',monospace; background:#f3f6fa; border-radius:8px;
+    padding:8px 12px; display:inline-block; font-size:16px; color:var(--azul); margin:2px 0 12px}
+
+  .opciones{display:grid; gap:11px}
+  .op{border:2px solid #e0e6ee; border-radius:13px; padding:14px 16px; font-size:17px;
+    cursor:pointer; transition:.12s; background:#fafbfd; text-align:left; font-weight:600; color:#333}
+  .op:hover:not(.bloq){border-color:var(--azul2); background:#eef4fc}
+  .op.correcta{border-color:var(--verde2); background:#eaf6dd; color:var(--verde)}
+  .op.incorrecta{border-color:var(--rojo); background:#fbe9e7; color:var(--rojo)}
+  .op.bloq{cursor:default}
+
+  .feedback{margin-top:16px; padding:14px 16px; border-radius:13px; font-size:15px; line-height:1.5; display:none}
+  .feedback.ok{background:#eaf6dd; color:var(--verde); border:1px solid #c5e29a; display:block}
+  .feedback.no{background:#fbe9e7; color:var(--rojo); border:1px solid #f0b8b0; display:block}
+  .feedback b{display:block; margin-bottom:3px}
+
+  /* Resultados */
+  .res-emoji{font-size:60px; text-align:center}
+  .res-score{font-size:34px; font-weight:800; text-align:center; color:var(--azul); margin:6px 0}
+  .res-msg{text-align:center; font-size:16px; color:#444; margin-bottom:18px}
+  .repaso h3{font-size:16px; color:var(--azul); margin:18px 0 10px}
+  .repaso-item{border-left:4px solid #e0e6ee; padding:8px 12px; margin-bottom:9px; font-size:14px; line-height:1.5}
+  .repaso-item.bien{border-color:var(--verde2); background:#f3faea}
+  .repaso-item.mal{border-color:var(--rojo); background:#fdf0ee}
+  .repaso-item .q{font-weight:600}
+  .repaso-item .a{color:var(--suave); margin-top:2px}
+  .repaso-item .a b{color:var(--verde)}
+  footer{text-align:center; font-size:11px; color:#9aa0a8; margin-top:18px}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="card" id="pantalla">
+    <!-- contenido dinámico -->
+  </div>
+  <footer>I.E.P. Wise House School · Aritmética 4° · Prof. Enzo Antara</footer>
+</div>
+
+<script>
+/* ====== GENERADORES DE PREGUNTAS ====== */
+const rnd = (a,b)=>Math.floor(Math.random()*(b-a+1))+a;
+const shuffle = arr => arr.map(v=>[Math.random(),v]).sort((a,b)=>a[0]-b[0]).map(v=>v[1]);
+function opciones(correcta, distractores){
+  const set = new Set([correcta]); const out=[correcta];
+  for(const d of distractores){ if(!set.has(d)){ set.add(d); out.push(d);} }
+  let g=0;
+  while(out.length<4 && g<50){ const d=correcta+rnd(-4,4); if(!set.has(d)&&d>=0){set.add(d);out.push(d);} g++; }
+  return shuffle(out.slice(0,4));
+}
+
+// Tipo 1: ¿es divisible?
+function gDivisible(){
+  const div = [2,3,4,5,6][rnd(0,4)];
+  const esDiv = Math.random()<0.5;
+  let n = esDiv ? div*rnd(2,12) : div*rnd(2,12)+rnd(1,div-1);
+  const r = n % div;
+  return {
+    enun:`¿El número ${n} es divisible entre ${div}?`,
+    ctx:`Recuerda: es divisible solo si el residuo es 0.`,
+    formula:`${n} ÷ ${div} → residuo ${r}`,
+    ops:["Sí, es divisible","No, no es divisible"],
+    correcta: r===0 ? "Sí, es divisible" : "No, no es divisible",
+    expl: r===0 ? `${n} = ${div}×${n/div}, el residuo es 0, así que SÍ es divisible.`
+                : `${n} ÷ ${div} deja residuo ${r} (distinto de 0), así que NO es divisible.`
+  };
+}
+// Tipo 2: residuo de una división
+function gResiduo(){
+  const div = [3,4,5,6,7][rnd(0,4)];
+  const n = div*rnd(2,14)+rnd(1,div-1);
+  const r = n % div;
+  return {
+    enun:`¿Cuánto sobra al dividir ${n} entre ${div}?`,
+    ctx:`Agrupa de ${div} en ${div} y mira cuánto queda.`,
+    formula:`${n} = ${div}×${Math.floor(n/div)} + ?`,
+    ops: opciones(r,[r+1,r-1>=0?r-1:r+2,(r+2)%div]).map(String),
+    correcta:String(r),
+    expl:`${n} = ${div}×${Math.floor(n/div)} + ${r}. El residuo es ${r}.`
+  };
+}
+// Tipo 3: notación °n + resto
+function gNotacion(){
+  const mod = [4,5,6,7][rnd(0,3)];
+  const n = mod*rnd(2,12)+rnd(1,mod-1);
+  const r = n%mod;
+  return {
+    enun:`Expresa ${n} en términos de °${mod} (múltiplo de ${mod}).`,
+    ctx:`Busca el múltiplo de ${mod} más cercano por debajo y suma lo que falta.`,
+    formula:`${n} = °${mod} + ?`,
+    ops: opciones(r,[r+1,r-1>=0?r-1:r+2,(r+mod-1)%mod]).map(x=>`°${mod} + ${x}`),
+    correcta:`°${mod} + ${r}`,
+    expl:`El múltiplo de ${mod} más cercano es ${n-r}, y faltan ${r}. Entonces ${n} = °${mod} + ${r}.`
+  };
+}
+// Tipo 4: juntar restos (problema)
+function gJuntar(){
+  const mod = [4,5,6][rnd(0,2)];
+  const r1 = rnd(1,mod-1), r2 = rnd(1,mod-1);
+  const rf = (r1+r2)%mod;
+  const nombres=[["Rubén","Sandra"],["Carmen","David"],["Pedro","Ana"],["Luis","Mía"]][rnd(0,3)];
+  return {
+    enun:`${nombres[0]} cuenta de ${mod} en ${mod} y le sobran ${r1}. ${nombres[1]} también de ${mod} en ${mod} y le sobran ${r2}. Si juntan todo, ¿cuánto sobra ahora?`,
+    ctx:`Pista: cuando juntas dos grupos, los restos se SUMAN y se vuelve a agrupar.`,
+    formula:`${r1} + ${r2} = ${r1+r2} → ÷ ${mod}`,
+    ops: opciones(rf,[r1+r2, (r1+r2+1)%mod, Math.abs(r1-r2)]).map(String),
+    correcta:String(rf),
+    expl: r1+r2<mod
+      ? `Los restos se suman: ${r1} + ${r2} = ${rf}. Como ${rf} es menor que ${mod}, sobra ${rf}.`
+      : `Los restos se suman: ${r1} + ${r2} = ${r1+r2}. Pero ${r1+r2} ≥ ${mod}, se vuelve a agrupar: ${r1+r2} ÷ ${mod} deja ${rf}. Sobra ${rf}.`
+  };
+}
+// Tipo 5: resto al multiplicar
+function gMultiplica(){
+  const mod = [5,6,7][rnd(0,2)];
+  const r = rnd(1,mod-1);
+  const k = rnd(2,4);
+  const rf = (r*k)%mod;
+  return {
+    enun:`Un número es °${mod} + ${r}. Si lo multiplico por ${k}, ¿cuál es el nuevo resto?`,
+    ctx:`Pista: el resto también se multiplica, y luego se vuelve a sacar el residuo.`,
+    formula:`${r} × ${k} = ${r*k} → ÷ ${mod}`,
+    ops: opciones(rf,[r*k, (r*k+1)%mod, r]).map(String),
+    correcta:String(rf),
+    expl:`El resto se multiplica: ${r} × ${k} = ${r*k}. Luego ${r*k} ÷ ${mod} deja residuo ${rf}. El nuevo resto es ${rf}.`
+  };
+}
+
+const GENERADORES = {
+  facil:  [gDivisible, gResiduo],
+  medio:  [gResiduo, gNotacion, gDivisible],
+  dificil:[gNotacion, gJuntar, gMultiplica]
+};
+
+/* ====== ESTADO ====== */
+let modo='medio', N=8, idx=0, puntos=0, racha=0, mejorRacha=0, preguntas=[], respondida=false, historial=[];
+
+function generarSet(){
+  const gens = GENERADORES[modo];
+  preguntas=[];
+  for(let i=0;i<N;i++){ const g = gens[rnd(0,gens.length-1)]; preguntas.push(g()); }
+}
+
+/* ====== PANTALLAS ====== */
+const P = document.getElementById('pantalla');
+
+function pantallaInicio(){
+  P.innerHTML = `
+    <header class="top">
+      <div class="lema">"Hoy pequeños emprendedores, mañana grandes líderes"</div>
+      <h1>🎯 Reto de Divisibilidad</h1>
+      <div class="sub">Múltiplos · Residuos · Notación °n · Principios</div>
+      <span class="badge">4° Primaria · Wise House School</span>
+    </header>
+    <div class="menu">
+      <p>Responde 8 preguntas y descubre cuánto sabes sobre la divisibilidad. ¡Puedes jugar las veces que quieras y las preguntas cambian cada vez! 🎲</p>
+      <div class="modos">
+        <div class="modo ${modo==='facil'?'sel':''}" data-m="facil">
+          <span class="emoji">🌱</span><div class="nombre">Fácil</div><div class="desc">¿Es divisible? Residuos</div></div>
+        <div class="modo ${modo==='medio'?'sel':''}" data-m="medio">
+          <span class="emoji">⭐</span><div class="nombre">Medio</div><div class="desc">Notación °n</div></div>
+        <div class="modo ${modo==='dificil'?'sel':''}" data-m="dificil">
+          <span class="emoji">🔥</span><div class="nombre">Difícil</div><div class="desc">Juntar restos</div></div>
+      </div>
+      <button class="btn" id="jugar">¡Empezar a jugar! 🚀</button>
+    </div>`;
+  document.querySelectorAll('.modo').forEach(el=>{
+    el.onclick=()=>{ modo=el.dataset.m; pantallaInicio(); };
+  });
+  document.getElementById('jugar').onclick=iniciar;
+}
+
+function iniciar(){
+  idx=0; puntos=0; racha=0; mejorRacha=0; historial=[];
+  generarSet();
+  pantallaPregunta();
+}
+
+function pantallaPregunta(){
+  respondida=false;
+  const q = preguntas[idx];
+  const pct = (idx/N)*100;
+  P.innerHTML = `
+    <div class="barra-cont">
+      <div class="progreso"><i style="width:${pct}%"></i></div>
+      <div class="puntos">⭐ ${puntos}/${N}</div>
+    </div>
+    <div class="pregunta-num">Pregunta ${idx+1} de ${N} ${racha>=2?'· 🔥 racha de '+racha:''}</div>
+    <div class="enunciado">${q.enun}</div>
+    <div class="contexto">${q.ctx}</div>
+    ${q.formula?`<div class="formula">${q.formula}</div>`:''}
+    <div class="opciones" id="ops"></div>
+    <div class="feedback" id="fb"></div>
+    <div id="cont"></div>`;
+  const cont = document.getElementById('ops');
+  q.ops.forEach(op=>{
+    const b=document.createElement('button');
+    b.className='op'; b.textContent=op;
+    b.onclick=()=>responder(op,b);
+    cont.appendChild(b);
+  });
+}
+
+function responder(op,btn){
+  if(respondida) return;
+  respondida=true;
+  const q = preguntas[idx];
+  const ok = op===q.correcta;
+  document.querySelectorAll('.op').forEach(b=>{
+    b.classList.add('bloq');
+    if(b.textContent===q.correcta) b.classList.add('correcta');
+    else if(b===btn) b.classList.add('incorrecta');
+  });
+  const fb=document.getElementById('fb');
+  if(ok){
+    puntos++; racha++; mejorRacha=Math.max(mejorRacha,racha);
+    fb.className='feedback ok';
+    fb.innerHTML=`<b>¡Correcto! 🎉</b>${q.expl}`;
+  }else{
+    racha=0;
+    fb.className='feedback no';
+    fb.innerHTML=`<b>Casi… 💡</b>${q.expl}`;
+  }
+  historial.push({enun:q.enun, correcta:q.correcta, elegida:op, ok});
+  const cont=document.getElementById('cont');
+  const b=document.createElement('button');
+  b.className='btn'+(ok?' verde':'');
+  b.textContent = (idx<N-1)?'Siguiente pregunta →':'Ver mis resultados 🏁';
+  b.onclick=()=>{ idx++; if(idx<N) pantallaPregunta(); else pantallaResultados(); };
+  cont.appendChild(b);
+}
+
+function pantallaResultados(){
+  const pct = Math.round((puntos/N)*100);
+  let emoji,msg;
+  if(pct===100){emoji='🏆';msg='¡Perfecto! Eres un campeón de la divisibilidad.';}
+  else if(pct>=75){emoji='🌟';msg='¡Muy bien! Dominas casi todo el tema.';}
+  else if(pct>=50){emoji='💪';msg='¡Buen trabajo! Repasa un poquito y mejorarás.';}
+  else {emoji='🌱';msg='¡Sigue practicando! Cada intento te hace mejor.';}
+
+  let repaso='';
+  historial.forEach((h,i)=>{
+    repaso += `<div class="repaso-item ${h.ok?'bien':'mal'}">
+      <div class="q">${i+1}. ${h.enun}</div>
+      <div class="a">${h.ok?'✅ Respondiste:':'❌ Tu respuesta: '+h.elegida+' · '}Respuesta correcta: <b>${h.correcta}</b></div>
+    </div>`;
+  });
+
+  P.innerHTML = `
+    <header class="top"><h1>Resultados</h1></header>
+    <div class="res-emoji">${emoji}</div>
+    <div class="res-score">${puntos} / ${N}</div>
+    <div class="res-msg">${msg}<br>${mejorRacha>=3?'🔥 Mejor racha: '+mejorRacha+' seguidas':''}</div>
+    <button class="btn verde" id="otra">Jugar otra vez 🔁</button>
+    <button class="btn gris" id="menu" style="margin-top:10px">Cambiar dificultad</button>
+    <div class="repaso"><h3>📋 Repaso de respuestas</h3>${repaso}</div>`;
+  document.getElementById('otra').onclick=iniciar;
+  document.getElementById('menu').onclick=pantallaInicio;
+}
+
+pantallaInicio();
+</script>
+</body>
+</html>
